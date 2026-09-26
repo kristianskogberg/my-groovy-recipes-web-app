@@ -1,22 +1,31 @@
 import { Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { LogOut } from "lucide-react";
 import ThemeSwitcher from "./theme.switcher";
 
+/**
+ * A header component that displays the app's logo and navigation links.
+ * @returns A React component that renders the app header.
+ */
 export default function AppHeader() {
+  const queryClient = useQueryClient();
   const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined);
   const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) =>
-      setIsSignedIn(Boolean(session?.user)),
-    );
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        queryClient.removeQueries({ queryKey: ["recipes"] });
+      }
+      setIsSignedIn(Boolean(session?.user));
+    });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   async function handleSignOut() {
     setAuthError("");

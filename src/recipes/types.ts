@@ -11,8 +11,6 @@ export type Recipe = {
 };
 
 export type RecipeResult = {
-  userId: string;
   recipes: Recipe[];
   imageUrls: Record<string, string>;
-  error: string | null;
 };

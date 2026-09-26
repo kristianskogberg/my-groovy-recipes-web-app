@@ -21,6 +21,10 @@ function getSavedTheme(): Theme {
   return "retro";
 }
 
+/**
+ * A component for changing the app's theme.
+ * @returns A React component that renders the theme switcher.
+ */
 export default function ThemeSwitcher() {
   const [theme, setTheme] = useState<Theme>(getSavedTheme);
 
