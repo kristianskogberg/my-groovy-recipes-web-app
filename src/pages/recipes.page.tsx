@@ -155,7 +155,7 @@ export default function RecipesPage() {
       <Modal
         open={showFilters}
         onClose={() => setShowFilters(false)}
-        title="Filter recipes"
+        title="Filter Recipes"
       >
         <fieldset className="flex flex-wrap gap-2">
           <legend className="mb-3 font-medium">Tags</legend>

@@ -92,7 +92,7 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
 
   return (
     <section className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 justify-center p-8">
-      <h1>{isRegistering ? "Create an account" : "Log in"}</h1>
+      <h1>{isRegistering ? "Register" : "Log in"}</h1>
       <p className="">
         {isRegistering ? "Already have an account? " : "New here? "}
         {isRegistering ? (

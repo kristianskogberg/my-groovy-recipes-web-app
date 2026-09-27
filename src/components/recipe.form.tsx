@@ -152,6 +152,11 @@ export default function RecipeForm({
   }
 
   function handleCancel() {
+    const message = initial
+      ? "Discard your unsaved changes to this recipe?"
+      : "Discard this new recipe?";
+    if (!window.confirm(message)) return;
+
     if (initial) {
       void navigate({
         to: "/recipes/$recipeId",
@@ -346,10 +351,10 @@ export default function RecipeForm({
             {formError || mutation.error?.message}
           </p>
         )}
-        <div className="flex justify-end gap-3 pb-4">
+        <div className="flex gap-3 pb-4">
           <button
             type="button"
-            className="button button-secondary"
+            className="button button-secondary shrink-0"
             disabled={mutation.isPending}
             onClick={handleCancel}
           >
@@ -357,7 +362,7 @@ export default function RecipeForm({
           </button>
           <button
             type="submit"
-            className="button"
+            className="button min-w-0 flex-1"
             disabled={mutation.isPending}
           >
             <Bookmark size={18} aria-hidden="true" />
