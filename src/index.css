@@ -207,3 +207,9 @@ h1 {
     box-shadow: none;
   }
 }
+
+@media (hover: none) and (pointer: coarse) {
+  button:focus {
+    outline: none;
+  }
+}
