@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useCurrentUserId } from "../hooks/useCurrentUserId";
 import { createRecipe, updateRecipe } from "../recipes/actions";
+import { isSupportedRecipeImage, RECIPE_IMAGE_ACCEPT } from "../recipes/image";
 import {
   recipeDetailQueryKey,
   recipeDetailQueryOptions,
@@ -238,7 +239,8 @@ function RecipeForm({
                     className="button button-secondary bg-background"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <ImageUp size={18} aria-hidden="true" /> Upload image
+                    <ImageUp size={18} aria-hidden="true" /> Add a photo of your
+                    finished recipe
                   </button>
                   <span className="text-sm text-foreground/70">or</span>
                   <button
@@ -247,7 +249,8 @@ function RecipeForm({
                     aria-expanded={showPresets}
                     onClick={() => setShowPresets((shown) => !shown)}
                   >
-                    <Images size={18} aria-hidden="true" /> Choose preset
+                    <Images size={18} aria-hidden="true" /> Choose a preset
+                    image
                   </button>
                 </div>
               )}
@@ -268,15 +271,17 @@ function RecipeForm({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={RECIPE_IMAGE_ACCEPT}
               hidden
               aria-label="Upload recipe image"
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 event.target.value = "";
                 if (!file) return;
-                if (!file.type.startsWith("image/")) {
-                  setFormError("Choose an image file.");
+                if (!isSupportedRecipeImage(file)) {
+                  setFormError(
+                    "Choose a JPEG, PNG, WebP, HEIC, HEIF, or AVIF image.",
+                  );
                   return;
                 }
                 setFormError("");
@@ -400,7 +405,9 @@ function RecipeForm({
           >
             <Bookmark size={18} aria-hidden="true" />
             {mutation.isPending
-              ? "Saving…"
+              ? image.kind === "upload"
+                ? "Optimizing and saving…"
+                : "Saving…"
               : initial
                 ? "Save Changes"
                 : "Save Recipe"}

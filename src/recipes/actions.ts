@@ -10,6 +10,7 @@ import {
   IMAGE_BUCKET,
   RECIPE_IMAGE_SIGNED_URL_VALID_FOR_SECONDS,
 } from "./constants";
+import { optimizeRecipeImage } from "./image";
 
 /**
  * Fetch recipes for a given user from Supabase
@@ -101,12 +102,11 @@ async function getImageUrl(recipe: RecipeDetail): Promise<string | undefined> {
 }
 
 async function uploadImage(userId: string, file: File): Promise<string> {
-  if (!file.type.startsWith("image/")) throw new Error("Choose an image file.");
-
-  const extension = file.name.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
+  const optimized = await optimizeRecipeImage(file);
+  const extension = optimized.name.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
   const path = `${userId}/${crypto.randomUUID()}${extension}`;
-  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, file, {
-    contentType: file.type,
+  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, optimized, {
+    contentType: optimized.type,
   });
   if (error) throw error;
   return path;
