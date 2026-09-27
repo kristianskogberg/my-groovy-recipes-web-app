@@ -179,7 +179,12 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
         disabled={isSubmitting || isGoogleSubmitting}
         onClick={handleGoogleSignIn}
       >
-        <img src="/google-logo.svg" alt="" aria-hidden="true" className="size-5" />
+        <img
+          src="/google-logo.svg"
+          alt=""
+          aria-hidden="true"
+          className="size-5"
+        />
         {isGoogleSubmitting ? "Connecting to Google…" : "Continue with Google"}
       </button>
     </section>
