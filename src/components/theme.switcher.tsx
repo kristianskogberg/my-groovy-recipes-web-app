@@ -30,6 +30,12 @@ export default function ThemeSwitcher() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute(
+        "content",
+        getComputedStyle(document.documentElement).backgroundColor,
+      );
     try {
       window.localStorage.setItem("theme", theme);
     } catch {

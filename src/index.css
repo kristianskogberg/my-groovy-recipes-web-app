@@ -12,6 +12,18 @@
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background-color: hsl(var(--background));
+  }
+
+  body,
+  #root {
+    min-height: 100dvh;
+  }
+
   :root,
   [data-theme="retro"] {
     --radius: 0.5rem;
@@ -100,6 +112,20 @@ h6 {
 }
 
 @layer components {
+  .input {
+    width: 100%;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    padding: 0.5rem 0.75rem;
+  }
+
+  .input:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
   .tag {
     display: inline-flex;
     border: 1px solid hsl(var(--input));
@@ -122,7 +148,7 @@ h6 {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    line-height: 1.25rem;
+    line-height: 1.5rem;
     box-shadow: 0 3px 0 hsl(var(--button-shadow));
     cursor: pointer;
     transition:

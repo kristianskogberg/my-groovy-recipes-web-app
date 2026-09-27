@@ -67,58 +67,61 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
   }
 
   return (
-    <section className="mx-auto max-w-md py-12">
+    <section className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 justify-center py-8">
       <h1 className="font-display text-3xl font-bold">
         {isRegistering ? "Create an account" : "Log in"}
       </h1>
-      <p className="mt-2">
+      <p className="">
         {isRegistering ? "Already have an account? " : "New here? "}
         {isRegistering ? (
           <Link to="/login" className="font-semibold underline">
-            Log in
+            Log in here
           </Link>
         ) : (
           <Link to="/register" className="font-semibold underline">
-            Register
+            Register here
           </Link>
         )}
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
           <span>Email</span>
           <input
+            id="email"
             type="email"
             autoComplete="email"
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-foreground"
+            className="input"
           />
         </label>
         <label className="flex flex-col gap-1">
           <span>Password</span>
           <input
+            id="password"
             type="password"
             autoComplete={isRegistering ? "new-password" : "current-password"}
             required
             minLength={6}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-foreground"
+            className="input"
           />
         </label>
         {isRegistering && (
           <label className="flex flex-col gap-1">
             <span>Confirm password</span>
             <input
+              id="confirm-password"
               type="password"
               autoComplete="new-password"
               required
               minLength={6}
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-foreground"
+              className="input"
             />
           </label>
         )}

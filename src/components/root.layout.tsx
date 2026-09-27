@@ -4,10 +4,10 @@ import AppHeader from "./app.header";
 
 export default function RootLayout() {
   return (
-    <div className="min-h-screen bg-background font-body text-foreground">
-      <div className="mx-auto w-full max-w-5xl px-3">
+    <div className="min-h-dvh bg-background font-body text-foreground">
+      <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-3">
         <AppHeader />
-        <main>
+        <main className="flex flex-1 flex-col">
           <Outlet />
         </main>
       </div>

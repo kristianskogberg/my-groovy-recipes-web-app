@@ -35,9 +35,6 @@ const presets = [
   "pizza",
 ] as const;
 
-const fieldClass =
-  "w-full rounded-md border border-border bg-[hsl(var(--field))] px-3 py-2 text-[hsl(var(--field-foreground))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
-
 function AuthRequired() {
   return (
     <p>
@@ -218,7 +215,7 @@ function RecipeForm({
   return (
     <section className="pb-8 text-foreground">
       <h1 className="font-display text-3xl font-bold">
-        {initial ? "Edit recipe" : "Add recipe"}
+        {initial ? "Edit Recipe" : "New Recipe"}
       </h1>
       <form
         onSubmit={handleSubmit}
@@ -437,12 +434,7 @@ function Field({
           </span>
         )}
       </span>
-      <input
-        name={name}
-        required={required}
-        className={fieldClass}
-        {...props}
-      />
+      <input name={name} required={required} className="input" {...props} />
     </label>
   );
 }
@@ -471,7 +463,7 @@ function TextField({
         name={name}
         required={required}
         rows={4}
-        className={fieldClass}
+        className="input"
         {...props}
       />
     </label>

@@ -23,13 +23,13 @@ export default function RecipesPage() {
   const recipes = recipesQuery.data?.recipes ?? [];
 
   return (
-    <section className="min-h-screen bg-background py-8 text-foreground">
+    <section className="min-h-screen bg-background pb-8 text-foreground">
       <div className="flex items-center gap-4">
         <h1 className="font-display text-3xl font-bold">My Recipes</h1>
         {userId && (
           <Link to="/recipes/new" className="button">
             <Plus />
-            Add recipe
+            New Recipe
           </Link>
         )}
       </div>
