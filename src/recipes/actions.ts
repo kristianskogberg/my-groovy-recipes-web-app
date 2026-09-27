@@ -1,8 +1,9 @@
 import { supabase } from "../lib/supabaseClient";
-import type { RecipeResult } from "./types";
-
-const IMAGE_BUCKET = "recipe-images";
-const SIGNED_URL_LIFETIME_SECONDS = 60 * 60;
+import type { RecipeDetailResult, RecipeResult } from "./types";
+import {
+  IMAGE_BUCKET,
+  RECIPE_IMAGE_SIGNED_URL_VALID_FOR_SECONDS,
+} from "./constants";
 
 /**
  * Fetch recipes for a given user from Supabase
@@ -13,7 +14,7 @@ export async function fetchRecipes(userId: string): Promise<RecipeResult> {
   const { data, error } = await supabase
     .from("recipes")
     .select(
-      "id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags",
+      "id, name, servings, time_minutes, calories_per_serving, image_source, image_value, tags",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
@@ -28,7 +29,10 @@ export async function fetchRecipes(userId: string): Promise<RecipeResult> {
   const { data: signedImages } = uploadPaths.length
     ? await supabase.storage
         .from(IMAGE_BUCKET)
-        .createSignedUrls(uploadPaths, SIGNED_URL_LIFETIME_SECONDS)
+        .createSignedUrls(
+          uploadPaths,
+          RECIPE_IMAGE_SIGNED_URL_VALID_FOR_SECONDS,
+        )
     : { data: null };
 
   const imageUrls: Record<string, string> = {};
@@ -49,4 +53,41 @@ export async function fetchRecipes(userId: string): Promise<RecipeResult> {
   }
 
   return { recipes, imageUrls };
+}
+
+export async function fetchRecipe(
+  userId: string,
+  recipeId: string,
+): Promise<RecipeDetailResult | null> {
+  const { data: recipe, error } = await supabase
+    .from("recipes")
+    .select(
+      "id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags, ingredients, steps",
+    )
+    .eq("user_id", userId)
+    .eq("id", recipeId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!recipe) return null;
+
+  let imageUrl: string | undefined;
+  if (recipe.image_value) {
+    if (recipe.image_source === "upload") {
+      const { data: signedImage } = await supabase.storage
+        .from(IMAGE_BUCKET)
+        .createSignedUrl(
+          recipe.image_value,
+          RECIPE_IMAGE_SIGNED_URL_VALID_FOR_SECONDS,
+        );
+      imageUrl =
+        signedImage?.signedUrl ??
+        supabase.storage.from(IMAGE_BUCKET).getPublicUrl(recipe.image_value)
+          .data.publicUrl;
+    } else if (/^(https?:\/\/|\/)/.test(recipe.image_value)) {
+      imageUrl = recipe.image_value;
+    }
+  }
+
+  return { recipe, imageUrl };
 }

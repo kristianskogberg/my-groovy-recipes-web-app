@@ -1,38 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
 import RecipeCard from "../components/recipe.card";
 import { Plus } from "lucide-react";
-import { fetchRecipes } from "../recipes/actions";
+import { useCurrentUserId } from "../hooks/useCurrentUserId";
+import { recipeListQueryOptions } from "../recipes/queries";
 
 /**
  * A page component that displays a list of recipes for the current user.
  * Uses Supabase and Tanstack Query to fetch recipes and manage loading and error states.
  * @returns A React component that renders the recipes page.
  */
-export default function Recipes() {
-  const [userId, setUserId] = useState<string | null | undefined>(undefined);
-
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user.id ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+export default function RecipesPage() {
+  const userId = useCurrentUserId();
 
   const recipesQuery = useQuery({
-    queryKey: ["recipes", userId],
-    queryFn: () => {
-      if (!userId) throw new Error("A user is required to fetch recipes.");
-      return fetchRecipes(userId);
-    },
+    ...recipeListQueryOptions(userId ?? ""),
     enabled: Boolean(userId),
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 50 * 60 * 1000,
   });
 
   const isLoading =
@@ -79,6 +62,7 @@ export default function Recipes() {
               key={recipe.id}
               recipe={recipe}
               imageUrl={recipesQuery.data.imageUrls[recipe.id]}
+              userId={userId}
             />
           ))}
         </ul>

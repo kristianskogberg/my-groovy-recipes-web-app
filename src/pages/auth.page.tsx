@@ -5,11 +5,11 @@ import { supabase } from "../lib/supabaseClient";
 type AuthMode = "login" | "register";
 
 /**
- * A form component for user authentication (login or registration).
+ * A paage component for user authentication (login or registration).
  * @param mode - The mode of the form, either "login" or "register".
  * @returns A React component that renders the authentication form.
  */
-export default function AuthForm({ mode }: { mode: AuthMode }) {
+export default function AuthPage({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
