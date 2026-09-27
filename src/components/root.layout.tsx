@@ -10,7 +10,7 @@ export default function RootLayout() {
     >
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-3">
         <AppHeader />
-        <main className="flex flex-1 flex-col">
+        <main className="mt-[calc(4.75rem+env(safe-area-inset-top))] flex flex-1 flex-col">
           <Outlet />
         </main>
       </div>

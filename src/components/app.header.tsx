@@ -65,10 +65,10 @@ export default function AppHeader() {
   }
 
   return (
-    <header className="py-4">
+    <header className="fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-5xl bg-background px-3 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
       <div
         ref={navigationRef}
-        className="relative flex items-center justify-between gap-2 bg-background text-foreground"
+        className="relative flex h-11 items-center justify-between gap-2 bg-background text-foreground"
       >
         <Link
           to="/"

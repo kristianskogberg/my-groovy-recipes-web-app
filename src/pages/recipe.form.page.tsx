@@ -93,6 +93,8 @@ function RecipeForm({
   const [image, setImage] = useState<RecipeImageInput>({ type: "keep" });
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [showPresets, setShowPresets] = useState(false);
+  const [tags, setTags] = useState<string[]>(initial?.recipe.tags ?? []);
+  const [tagDraft, setTagDraft] = useState("");
   const [formError, setFormError] = useState("");
 
   useEffect(() => {
@@ -191,14 +193,7 @@ function RecipeForm({
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean),
-      tags: [
-        ...new Set(
-          String(data.get("tags") ?? "")
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        ),
-      ],
+      tags: [...new Set([...tags, tagDraft.trim()].filter(Boolean))],
     };
     mutation.mutate({ input, selectedImage: image });
   }
@@ -216,9 +211,7 @@ function RecipeForm({
 
   return (
     <section className="pb-8 text-foreground">
-      <h1 className="font-display text-3xl font-bold">
-        {initial ? "Edit Recipe" : "New Recipe"}
-      </h1>
+      <h1>{initial ? "Edit Recipe" : "New Recipe"}</h1>
       <form
         onSubmit={handleSubmit}
         className="mt-6 grid gap-4"
@@ -343,12 +336,56 @@ function RecipeForm({
             placeholder="One step per line"
             defaultValue={initial?.recipe.steps.join("\n") ?? ""}
           />
-          <Field
-            label="Tags"
-            name="tags"
-            placeholder="Separate tags with commas"
-            defaultValue={initial?.recipe.tags.join(", ") ?? ""}
-          />
+          <div className="grid gap-2 text-sm font-medium">
+            <label htmlFor="recipe-tags">Tags</label>
+            <input
+              id="recipe-tags"
+              className="input"
+              value={tagDraft}
+              placeholder="Type a tag, then press comma"
+              onChange={(event) => {
+                const parts = event.target.value.split(",");
+                setTagDraft(parts.pop() ?? "");
+                const added = parts.map((part) => part.trim()).filter(Boolean);
+                if (added.length) {
+                  setTags((current) => [...new Set([...current, ...added])]);
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" || event.nativeEvent.isComposing)
+                  return;
+                event.preventDefault();
+                const tag = tagDraft.trim();
+                if (!tag) return;
+                setTags((current) => [...new Set([...current, tag])]);
+                setTagDraft("");
+              }}
+            />
+            {tags.length > 0 && (
+              <div
+                className="flex flex-wrap gap-2 mt-1"
+                aria-label="Recipe tags"
+              >
+                {tags.map((tag) => (
+                  <span key={tag} className="tag items-center gap-2">
+                    {tag}
+                    <button
+                      type="button"
+                      aria-label={`Remove ${tag} tag`}
+                      className="cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-primary"
+                      onClick={() =>
+                        setTags((current) =>
+                          current.filter((item) => item !== tag),
+                        )
+                      }
+                    >
+                      <X size={14} aria-hidden="true" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </fieldset>
 
         {(formError || mutation.error) && (

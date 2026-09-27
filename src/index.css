@@ -112,6 +112,16 @@ h6 {
   @apply font-display;
 }
 
+h1 {
+  @apply text-2xl font-bold;
+}
+
+@media (width >= 40rem) {
+  h1 {
+    @apply text-3xl;
+  }
+}
+
 @layer components {
   .input {
     width: 100%;

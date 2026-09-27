@@ -24,8 +24,8 @@ export default function RecipesPage() {
 
   return (
     <section className="min-h-screen bg-background pb-8 text-foreground">
-      <div className="flex items-center gap-4">
-        <h1 className="font-display text-3xl font-bold">My Recipes</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1>My Recipes</h1>
         {userId && (
           <Link to="/recipes/new" className="button">
             <Plus />
