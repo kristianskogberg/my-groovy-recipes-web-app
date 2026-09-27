@@ -17,7 +17,30 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const isRegistering = mode === "register";
+
+  async function handleGoogleSignIn() {
+    setError("");
+    setMessage("");
+    setIsGoogleSubmitting(true);
+
+    try {
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/` },
+      });
+      if (authError) throw authError;
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Could not start Google sign-in. Please try again.",
+      );
+    } finally {
+      setIsGoogleSubmitting(false);
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -133,7 +156,11 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
         )}
         {message && <p role="status">{message}</p>}
 
-        <button type="submit" disabled={isSubmitting} className="button">
+        <button
+          type="submit"
+          disabled={isSubmitting || isGoogleSubmitting}
+          className="button"
+        >
           {isSubmitting
             ? "Please wait…"
             : isRegistering
@@ -141,6 +168,20 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
               : "Log in"}
         </button>
       </form>
+      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        <span>or</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
+      <button
+        type="button"
+        className="button button-secondary"
+        disabled={isSubmitting || isGoogleSubmitting}
+        onClick={handleGoogleSignIn}
+      >
+        <img src="/google-logo.svg" alt="" aria-hidden="true" className="size-5" />
+        {isGoogleSubmitting ? "Connecting to Google…" : "Continue with Google"}
+      </button>
     </section>
   );
 }
