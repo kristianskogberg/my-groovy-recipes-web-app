@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { LogIn, UserRoundPlus } from "lucide-react";
 
 type AuthMode = "login" | "register";
 
@@ -90,10 +91,8 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 justify-center py-8">
-      <h1>
-        {isRegistering ? "Create an account" : "Log in"}
-      </h1>
+    <section className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 justify-center p-8">
+      <h1>{isRegistering ? "Create an account" : "Log in"}</h1>
       <p className="">
         {isRegistering ? "Already have an account? " : "New here? "}
         {isRegistering ? (
@@ -161,6 +160,11 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
           disabled={isSubmitting || isGoogleSubmitting}
           className="button"
         >
+          {isRegistering ? (
+            <UserRoundPlus aria-hidden="true" />
+          ) : (
+            <LogIn aria-hidden="true" />
+          )}
           {isSubmitting
             ? "Please wait…"
             : isRegistering

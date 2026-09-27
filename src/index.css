@@ -123,6 +123,11 @@ h1 {
 }
 
 @layer components {
+  .input,
+  .button {
+    min-height: 2.75rem;
+  }
+
   .input {
     width: 100%;
     font-size: 1rem;
