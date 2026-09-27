@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { Modal } from "../components/modal";
 import { useCurrentUserId } from "../hooks/useCurrentUserId";
 import { createRecipe, updateRecipe } from "../recipes/actions";
 import { isSupportedRecipeImage, RECIPE_IMAGE_ACCEPT } from "../recipes/image";
@@ -89,7 +90,7 @@ function RecipeForm({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [image, setImage] = useState<RecipeImageInput>({ kind: "keep" });
+  const [image, setImage] = useState<RecipeImageInput>({ type: "keep" });
   const [previewUrl, setPreviewUrl] = useState<string>();
   const [showPresets, setShowPresets] = useState(false);
   const [formError, setFormError] = useState("");
@@ -149,11 +150,11 @@ function RecipeForm({
   });
 
   const displayedImage =
-    image.kind === "upload"
+    image.type === "upload"
       ? previewUrl
-      : image.kind === "preset"
+      : image.type === "preset"
         ? image.value
-        : image.kind === "remove"
+        : image.type === "remove"
           ? undefined
           : (initial?.imageUrl ??
             (initial?.recipe.image_source === "preset"
@@ -246,8 +247,7 @@ function RecipeForm({
                   <button
                     type="button"
                     className="button button-secondary bg-background"
-                    aria-expanded={showPresets}
-                    onClick={() => setShowPresets((shown) => !shown)}
+                    onClick={() => setShowPresets(true)}
                   >
                     <Images size={18} aria-hidden="true" /> Choose a preset
                     image
@@ -260,7 +260,7 @@ function RecipeForm({
                   className="button button-secondary absolute right-3 top-3"
                   aria-label="Remove image"
                   onClick={() => {
-                    setImage({ kind: "remove" });
+                    setImage({ type: "remove" });
                     setPreviewUrl(undefined);
                   }}
                 >
@@ -285,44 +285,11 @@ function RecipeForm({
                   return;
                 }
                 setFormError("");
-                setImage({ kind: "upload", file });
+                setImage({ type: "upload", file });
                 setPreviewUrl(URL.createObjectURL(file));
                 setShowPresets(false);
               }}
             />
-            {showPresets && (
-              <div
-                className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4"
-                aria-label="Preset images"
-              >
-                {presets.map((preset) => {
-                  const value = `/presets/${preset}.png`;
-                  return (
-                    <button
-                      key={preset}
-                      type="button"
-                      aria-label={preset.replaceAll("-", " ")}
-                      aria-pressed={
-                        image.kind === "preset" && image.value === value
-                      }
-                      className="overflow-hidden rounded-md border-2 border-transparent focus-visible:outline-2 focus-visible:outline-primary aria-pressed:border-primary"
-                      onClick={() => {
-                        setImage({ kind: "preset", value });
-                        setPreviewUrl(undefined);
-                        setShowPresets(false);
-                      }}
-                    >
-                      <img
-                        src={value}
-                        alt=""
-                        className="aspect-square w-full object-cover"
-                        loading="lazy"
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            )}
           </div>
 
           <Field
@@ -405,7 +372,7 @@ function RecipeForm({
           >
             <Bookmark size={18} aria-hidden="true" />
             {mutation.isPending
-              ? image.kind === "upload"
+              ? image.type === "upload"
                 ? "Optimizing and saving…"
                 : "Saving…"
               : initial
@@ -414,6 +381,38 @@ function RecipeForm({
           </button>
         </div>
       </form>
+      <Modal
+        open={showPresets}
+        onClose={() => setShowPresets(false)}
+        title="Choose a preset image"
+      >
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4">
+          {presets.map((preset) => {
+            const value = `/presets/${preset}.png`;
+            return (
+              <button
+                key={preset}
+                type="button"
+                aria-label={preset.replaceAll("-", " ")}
+                aria-pressed={image.type === "preset" && image.value === value}
+                className="overflow-hidden rounded-md border-2 border-transparent focus-visible:outline-2 focus-visible:outline-primary aria-pressed:border-primary"
+                onClick={() => {
+                  setImage({ type: "preset", value });
+                  setPreviewUrl(undefined);
+                  setShowPresets(false);
+                }}
+              >
+                <img
+                  src={value}
+                  alt=""
+                  className="aspect-square w-full object-cover"
+                  loading="lazy"
+                />
+              </button>
+            );
+          })}
+        </div>
+      </Modal>
     </section>
   );
 }

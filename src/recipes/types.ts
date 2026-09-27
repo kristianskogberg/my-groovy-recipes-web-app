@@ -38,7 +38,7 @@ export type RecipeInput = Pick<
 >;
 
 export type RecipeImageInput =
-  | { kind: "keep" }
-  | { kind: "remove" }
-  | { kind: "preset"; value: string }
-  | { kind: "upload"; file: File };
+  | { type: "keep" }
+  | { type: "remove" }
+  | { type: "preset"; value: string }
+  | { type: "upload"; file: File };

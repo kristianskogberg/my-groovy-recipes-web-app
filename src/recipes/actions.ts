@@ -105,9 +105,11 @@ async function uploadImage(userId: string, file: File): Promise<string> {
   const optimized = await optimizeRecipeImage(file);
   const extension = optimized.name.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
   const path = `${userId}/${crypto.randomUUID()}${extension}`;
-  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, optimized, {
-    contentType: optimized.type,
-  });
+  const { error } = await supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, optimized, {
+      contentType: optimized.type,
+    });
   if (error) throw error;
   return path;
 }
@@ -135,18 +137,26 @@ export async function createRecipe(
 ): Promise<RecipeDetailResult> {
   validateInput(input);
   const uploadPath =
-    image.kind === "upload" ? await uploadImage(userId, image.file) : null;
+    image.type === "upload" ? await uploadImage(userId, image.file) : null;
   const imageSource = uploadPath
     ? "upload"
-    : image.kind === "preset"
+    : image.type === "preset"
       ? "preset"
       : null;
-  const imageValue = uploadPath ?? (image.kind === "preset" ? image.value : null);
+  const imageValue =
+    uploadPath ?? (image.type === "preset" ? image.value : null);
 
   const { data, error } = await supabase
     .from("recipes")
-    .insert({ ...input, user_id: userId, image_source: imageSource, image_value: imageValue })
-    .select("id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags, ingredients, steps")
+    .insert({
+      ...input,
+      user_id: userId,
+      image_source: imageSource,
+      image_value: imageValue,
+    })
+    .select(
+      "id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags, ingredients, steps",
+    )
     .single();
 
   if (error || !data) {
@@ -175,20 +185,27 @@ export async function updateRecipe(
   if (!previous) throw new Error("Recipe not found.");
 
   const uploadPath =
-    image.kind === "upload" ? await uploadImage(userId, image.file) : null;
+    image.type === "upload" ? await uploadImage(userId, image.file) : null;
   const imageUpdate =
-    image.kind === "keep"
+    image.type === "keep"
       ? {}
       : {
-          image_source: uploadPath ? "upload" : image.kind === "preset" ? "preset" : null,
-          image_value: uploadPath ?? (image.kind === "preset" ? image.value : null),
+          image_source: uploadPath
+            ? "upload"
+            : image.type === "preset"
+              ? "preset"
+              : null,
+          image_value:
+            uploadPath ?? (image.type === "preset" ? image.value : null),
         };
   const { data, error } = await supabase
     .from("recipes")
     .update({ ...input, ...imageUpdate })
     .eq("user_id", userId)
     .eq("id", recipeId)
-    .select("id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags, ingredients, steps")
+    .select(
+      "id, name, description, servings, time_minutes, calories_per_serving, image_source, image_value, tags, ingredients, steps",
+    )
     .maybeSingle();
 
   if (error || !data) {
@@ -197,7 +214,7 @@ export async function updateRecipe(
   }
 
   if (
-    image.kind !== "keep" &&
+    image.type !== "keep" &&
     previous.image_source === "upload" &&
     previous.image_value &&
     previous.image_value !== data.image_value
@@ -209,7 +226,10 @@ export async function updateRecipe(
 }
 
 /** Deletes one of the user's recipes and its uploaded image. */
-export async function deleteRecipe(userId: string, recipeId: string): Promise<void> {
+export async function deleteRecipe(
+  userId: string,
+  recipeId: string,
+): Promise<void> {
   const { data, error } = await supabase
     .from("recipes")
     .delete()
