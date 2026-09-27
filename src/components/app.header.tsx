@@ -93,21 +93,21 @@ export default function AppHeader() {
         </button>
         <nav
           id="header-navigation"
-          className={`${isMenuOpen ? "flex" : "hidden"} absolute right-0 top-full z-50 mt-2 w-max max-w-[calc(100vw-1.5rem)] flex-col items-start gap-3 rounded-lg border border-border bg-background p-4 shadow-lg md:static md:mt-0 md:flex md:w-auto md:max-w-none md:flex-row md:items-center md:gap-4 md:border-0 md:p-0 md:shadow-none`}
+          className={`${isMenuOpen ? "flex" : "hidden"} absolute right-0 top-full z-50 mt-2 w-max max-w-[calc(100vw-1.5rem)] flex-col items-start gap-4 rounded-lg border border-border bg-background p-4 shadow-lg md:static md:mt-0 md:flex md:w-auto md:max-w-none md:flex-row md:items-center md:gap-4 md:border-0 md:p-0 md:shadow-none`}
           aria-label="Main navigation"
         >
           {isSignedIn === false && (
             <>
               <Link
                 to="/login"
-                className="[&.active]:font-bold"
+                className="[&.active]:font-bold button-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Log in
               </Link>
               <Link
                 to="/register"
-                className="[&.active]:font-bold"
+                className="[&.active]:font-bold button-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Register

@@ -1,5 +1,5 @@
-import { Link, useParams } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, Flame, Pencil, Trash2, UserRound } from "lucide-react";
 import { useCurrentUserId } from "../hooks/useCurrentUserId";
 import {
@@ -8,6 +8,8 @@ import {
 } from "../recipes/queries";
 import type { RecipeResult } from "../recipes/types";
 import { SIGNED_IMAGE_REFRESH_MS } from "../recipes/constants";
+import { deleteRecipe } from "../recipes/actions";
+import { recipeDetailQueryKey } from "../recipes/queries";
 
 /**
  * A page component that displays the details of a single recipe.
@@ -15,8 +17,35 @@ import { SIGNED_IMAGE_REFRESH_MS } from "../recipes/constants";
  */
 export default function RecipePage() {
   const { recipeId } = useParams({ from: "/recipes/$recipeId" });
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const userId = useCurrentUserId();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteRecipe(userId!, recipeId),
+    onSuccess: async () => {
+      if (!userId) return;
+      const listKey = recipeListQueryKey(userId);
+      queryClient.setQueryData<RecipeResult>(listKey, (previous) => {
+        if (!previous) return previous;
+        const imageUrls = { ...previous.imageUrls };
+        delete imageUrls[recipeId];
+        return {
+          recipes: previous.recipes.filter((item) => item.id !== recipeId),
+          imageUrls,
+        };
+      });
+      await queryClient.invalidateQueries({ queryKey: listKey, refetchType: "none" });
+      await navigate({ to: "/" });
+      queryClient.removeQueries({ queryKey: recipeDetailQueryKey(userId, recipeId), exact: true });
+    },
+  });
+
+  function handleDelete() {
+    if (!userId || deleteMutation.isPending) return;
+    if (!window.confirm("Delete this recipe? This cannot be undone.")) return;
+    deleteMutation.mutate();
+  }
 
   const recipeQuery = useQuery({
     ...recipeDetailQueryOptions(userId ?? "", recipeId),
@@ -69,6 +98,12 @@ export default function RecipePage() {
         </p>
       )}
 
+      {userId && deleteMutation.isError && (
+        <p role="alert" className="mb-6 text-red-700">
+          Could not delete recipe: {deleteMutation.error.message}
+        </p>
+      )}
+
       {userId && notFound && <p>Recipe not found.</p>}
 
       {userId && !recipe && !notFound && !recipeQuery.isError && (
@@ -92,17 +127,22 @@ export default function RecipePage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <h1 className="text-3xl font-bold">{recipe.name}</h1>
             <div className="flex gap-2">
-              <button type="button" className="button" disabled>
+              <Link
+                to="/recipes/$recipeId/edit"
+                params={{ recipeId }}
+                className="button"
+              >
                 <Pencil size={16} aria-hidden="true" />
                 Edit
-              </button>
+              </Link>
               <button
                 type="button"
                 className="button button-secondary"
-                disabled
+                disabled={deleteMutation.isPending}
+                onClick={handleDelete}
               >
                 <Trash2 size={16} aria-hidden="true" />
-                Delete
+                {deleteMutation.isPending ? "Deleting…" : "Delete"}
               </button>
             </div>
           </div>

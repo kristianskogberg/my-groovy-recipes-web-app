@@ -24,3 +24,21 @@ export type RecipeDetailResult = {
   recipe: RecipeDetail;
   imageUrl?: string;
 };
+
+export type RecipeInput = Pick<
+  RecipeDetail,
+  | "name"
+  | "description"
+  | "servings"
+  | "time_minutes"
+  | "calories_per_serving"
+  | "ingredients"
+  | "steps"
+  | "tags"
+>;
+
+export type RecipeImageInput =
+  | { kind: "keep" }
+  | { kind: "remove" }
+  | { kind: "preset"; value: string }
+  | { kind: "upload"; file: File };

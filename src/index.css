@@ -148,7 +148,7 @@ h6 {
   }
 
   .button-secondary {
-    background: transparent;
+    background: hsl(var(--background));
     color: hsl(var(--secondary-foreground));
   }
 

@@ -17,10 +17,15 @@ export function recipeListQueryOptions(userId: string) {
   });
 }
 
+/** Returns the cache key for one user's recipe detail. */
+export function recipeDetailQueryKey(userId: string, recipeId: string) {
+  return ["recipes", userId, "detail", recipeId] as const;
+}
+
 /** Configures a user's single-recipe query and its refresh schedule. */
 export function recipeDetailQueryOptions(userId: string, recipeId: string) {
   return queryOptions({
-    queryKey: ["recipes", userId, "detail", recipeId] as const,
+    queryKey: recipeDetailQueryKey(userId, recipeId),
     queryFn: () => fetchRecipe(userId, recipeId),
     staleTime: STALE_TIME_MS,
     refetchInterval: SIGNED_IMAGE_REFRESH_MS,

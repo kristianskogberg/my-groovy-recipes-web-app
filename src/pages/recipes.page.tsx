@@ -27,10 +27,10 @@ export default function RecipesPage() {
       <div className="flex items-center gap-4">
         <h1 className="font-display text-3xl font-bold">My Recipes</h1>
         {userId && (
-          <button type="button" className="button">
+          <Link to="/recipes/new" className="button">
             <Plus />
             Add recipe
-          </button>
+          </Link>
         )}
       </div>
 
