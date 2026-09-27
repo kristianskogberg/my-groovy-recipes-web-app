@@ -61,11 +61,21 @@ export default function RecipesPage() {
                 id="recipe-search"
                 type="search"
                 aria-label="Search recipes by name"
-                className="input pl-10"
+                className="input pl-10 pr-11"
                 placeholder="Search recipes by name..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
+              {search.length > 0 && (
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  className="absolute inset-y-0 right-0 flex w-11 cursor-pointer items-center justify-center text-foreground/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+                  onClick={() => setSearch("")}
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              )}
             </div>
             <button
               type="button"

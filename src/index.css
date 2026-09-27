@@ -143,6 +143,10 @@ h1 {
     outline-offset: 2px;
   }
 
+  .input[type="search"]::-webkit-search-cancel-button {
+    display: none;
+  }
+
   .tag {
     display: inline-flex;
     border: 1px solid hsl(var(--input));
